@@ -33,7 +33,12 @@
 
     <main>
       <section id="view-dashboard" class="view">
+        <div class="tabs" id="dashboard-tabs" role="tablist">
+          <button class="tab is-active" id="tab-liste" data-tab="liste" type="button" role="tab" aria-selected="true">Liste</button>
+          <button class="tab" id="tab-matrice" data-tab="matrice" type="button" role="tab" aria-selected="false">Matrice</button>
+        </div>
         <div id="dashboard-list" class="list"></div>
+        <div id="dashboard-matrix" class="matrix-wrap" hidden></div>
       </section>
 
       <section id="view-detail" class="view" hidden>

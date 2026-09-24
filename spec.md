@@ -83,6 +83,7 @@ Un concurrent est composé de :
 - `sources` : liste d'entrées `{ info, lien_ou_texte, date, statut }`, `statut` = vérifié / non vérifié
 - `statut_fiche` : actif / archivé
 - `date_derniere_maj`
+- `axe_gouvernance`, `axe_sophistication` : position 0-10 sur la matrice de comparaison (voir « Itération — Matrice de positionnement » ci-dessous) ; `null` tant que non renseignés
 
 ### Résultat attendu (étapes à dérouler pour vérifier)
 
@@ -114,6 +115,31 @@ Un concurrent est composé de :
 - Export (PDF, slide, battle card) ou intégration avec d'autres outils (CRM, Notion, Slack).
 - Notifications ou alertes sur les mouvements concurrentiels.
 - Vue « actualités / flux » séparée du Dashboard comparatif.
+
+---
+
+## Itération — Matrice de positionnement
+
+Première itération post-V1. Le résumé exécutif ([executive-summary-qomit.md](executive-summary-qomit.md)) contenait une matrice 2x2 statique positionnant les concurrents (Sophistication IA × Gouvernance multi-marques). Cette itération rend ce visuel dynamique et pilotable depuis les vraies fiches concurrents, dans le même esprit « consultable en quelques secondes » que le Dashboard.
+
+### Écran — Dashboard, onglet Matrice
+- Le Dashboard gagne deux onglets : **Liste** (comportement V1 inchangé) et **Matrice**.
+- L'onglet Matrice n'est proposé qu'en vue concurrents actifs (masqué quand « Archivés » est actif — la comparaison ne porte que sur la veille en cours).
+- Nuage de points : un point par concurrent actif, positionné selon ses deux axes, étiqueté par son nom, cliquable (ouvre la fiche détail, comme une ligne de la liste).
+- Couleur du point = couleur du badge de niveau de menace du concurrent (cohérence avec la liste).
+- Un concurrent dont les deux axes ne sont pas encore renseignés apparaît au centre avec un style visuellement distinct (point vide/pointillé), pour ne pas laisser croire à un positionnement réel.
+
+### Écran — Fiche détail, bloc « Position sur la matrice »
+- Nouveau bloc, juste après Positionnement : deux curseurs (0-10) « Gouvernance multi-marques » et « Sophistication IA ».
+- Tant qu'aucun des deux axes n'est renseigné, le bloc affiche « Non positionné sur la matrice. » + action `+ Positionner` (initialise les deux axes au centre, 5/10, à ajuster ensuite).
+- Chaque curseur sauvegarde sa valeur au relâchement, comme les autres champs de la fiche.
+
+### Données
+- Deux nouveaux champs par concurrent : `axe_gouvernance`, `axe_sophistication` (entiers 0-10, `null` par défaut). Voir section Données ci-dessus.
+
+### Hors périmètre de cette itération
+- Pas de axes personnalisables (les deux dimensions restent fixes : Gouvernance multi-marques / Sophistication IA).
+- Pas d'export de la matrice (voir « Hors périmètre V1 »).
 
 ---
 
@@ -154,3 +180,9 @@ Un concurrent est composé de :
   - *Attente* : recherche IA en cours → bouton `Rechercher` désactivé avec spinner, le reste de la fiche reste consultable.
   - *Échec* : recherche IA échouée → « La recherche a échoué. » sous le bouton, sans détail technique ; le reste de la fiche n'est pas affecté.
 - **Actions et libellés exacts** : `Rechercher` (recherche IA) ; `Archiver` ; `À vérifier` (bascule individuelle sur chaque information) ; édition inline des champs, sans bouton dédié (clic sur le champ = édition directe).
+
+### Écran — Dashboard, onglet Matrice
+- **Onglets** : `Liste` / `Matrice`, sobres (soulignement accent sur l'onglet actif), pas d'icône.
+- **Axes** : labels discrets (texte tertiaire, petites majuscules), pas de graduation chiffrée — l'usage est comparatif, pas analytique.
+- **Points** : couleur = badge de niveau de menace (plein = Haute, clair = Moyenne, gris neutre = Basse), point pointillé/vide pour un concurrent non positionné.
+- **États** : liste vide → même état que l'onglet Liste (« Aucun concurrent pour l'instant. » + `Ajouter`).

@@ -214,6 +214,7 @@ button, input, textarea, select {
 /* Dashboard list */
 
 .list { display: flex; flex-direction: column; }
+.list[hidden] { display: none; }
 
 .row {
   display: flex;
@@ -253,6 +254,76 @@ button, input, textarea, select {
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+/* Tabs (Dashboard : Liste / Matrice) */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 4px 10px;
+  margin-right: 16px;
+  cursor: pointer;
+}
+.tab:hover { color: var(--color-text); }
+.tab.is-active { color: var(--color-text); border-bottom-color: var(--color-accent); }
+
+/* Matrice de positionnement */
+
+.matrix-wrap[hidden] { display: none; }
+
+.matrix-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.matrix-axis { stroke: var(--color-border); stroke-width: 1.5; }
+.matrix-gridline { stroke: var(--color-border); stroke-width: 1; stroke-dasharray: 3 4; }
+
+.matrix-axis-label {
+  fill: var(--color-text-tertiary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.matrix-item { cursor: pointer; }
+.matrix-item:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+.matrix-point { stroke-width: 2; }
+.matrix-point-haute { fill: var(--color-accent); stroke: var(--color-accent); }
+.matrix-point-moyenne { fill: var(--color-accent-tint); stroke: var(--color-accent-dark); }
+.matrix-point-basse { fill: var(--color-neutral-badge-bg); stroke: var(--color-neutral-badge-text); }
+.matrix-point-unset { fill: #FFFFFF; stroke: var(--color-text-tertiary); stroke-dasharray: 2 2; }
+
+.matrix-label {
+  fill: var(--color-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.matrix-slider-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+.matrix-slider-label { font-size: 13px; color: var(--color-text-secondary); }
+.matrix-slider-row input[type="range"] { accent-color: var(--color-accent); width: 100%; }
+.matrix-slider-value { font-size: 12px; color: var(--color-text-tertiary); min-width: 32px; text-align: right; }
 
 /* Empty / loading / error states */
 
@@ -374,8 +445,10 @@ button, input, textarea, select {
   color: var(--color-text-tertiary);
   flex-shrink: 0;
 }
-.field-list li.field-empty-note {
+.field-empty-note {
+  font-size: 14px;
   color: var(--color-text-tertiary);
+  margin: 0 0 4px;
 }
 .field-list li.field-empty-note::before { content: ""; }
 
