@@ -20,14 +20,17 @@
           <span class="brand-caption">Veille concurrentielle</span>
         </div>
       </div>
-      <div class="header-actions" id="dashboard-actions">
-        <button class="btn btn-ghost" id="btn-toggle-archived" type="button">Archivés</button>
-        <button class="btn btn-primary" id="btn-add" type="button">
-          <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-          Ajouter
-        </button>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm" id="btn-context" type="button">Contexte marché</button>
+        <div class="header-actions-dashboard" id="dashboard-actions">
+          <button class="btn btn-ghost" id="btn-toggle-archived" type="button">Archivés</button>
+          <button class="btn btn-primary" id="btn-add" type="button">
+            <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            Ajouter
+          </button>
+        </div>
       </div>
     </header>
 
@@ -49,6 +52,79 @@
           Dashboard
         </button>
         <div id="detail-content"></div>
+      </section>
+
+      <section id="view-context" class="view" hidden>
+        <button class="link-back" id="btn-context-back" type="button">
+          <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Dashboard
+        </button>
+
+        <div class="context-content">
+          <h1 class="context-title">Qomit — Le Gouverneur du Checkout</h1>
+          <p class="context-lede">
+            Qomit se différencie par la <strong>gouvernance checkout</strong> (conversion + fraude + compliance multi-marques),
+            pas par le payment processing. Aucun concurrent n'adresse aujourd'hui cette tri-dimensionnalité : Qomit opère seul
+            sur cette intersection — un <strong>Blue Ocean</strong>.
+          </p>
+
+          <div class="field-block">
+            <div class="field-label">Les 3 dimensions Qomit</div>
+            <ul class="field-list context-static-list">
+              <li>Conversion IA — scoring comportemental</li>
+              <li>Risque / Fraude — routing adaptatif</li>
+              <li>Gouvernance multi-marques — design, compliance, reporting</li>
+            </ul>
+          </div>
+
+          <div class="field-block">
+            <div class="field-label">Le marché en chiffres</div>
+            <div class="stats-table-scroll">
+              <table class="stats-table">
+                <thead>
+                  <tr><th>Métrique</th><th>Valeur</th><th>Implication</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Marché Checkout Friction Reduction</td>
+                    <td>4,6 Md$ (2026) → 10,3 Md$ (2036)</td>
+                    <td>+8,4 % CAGR — croissance saine</td>
+                  </tr>
+                  <tr>
+                    <td>Commandes perdues annuellement</td>
+                    <td>260 Md$</td>
+                    <td>Un problème massif à adresser</td>
+                  </tr>
+                  <tr>
+                    <td>Part des commandes mobile</td>
+                    <td>71 %</td>
+                    <td>Mobile-first critique</td>
+                  </tr>
+                  <tr>
+                    <td>Croissance Stripe (TPV)</td>
+                    <td>+34 % YoY</td>
+                    <td>Marché dynamique et compétitif</td>
+                  </tr>
+                  <tr>
+                    <td>TAM potentiel Qomit</td>
+                    <td>1 à 1,5 Md$</td>
+                    <td>10–15 % du marché en 5 ans</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="field-block">
+            <div class="field-label">Sources</div>
+            <p class="context-source">
+              Stripe TPV data, Baymard Institute, 6sense, market research 2026 —
+              résumé exécutif Qomit, 23 septembre 2026.
+            </p>
+          </div>
+        </div>
       </section>
     </main>
   </div>

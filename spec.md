@@ -151,6 +151,25 @@ Première itération post-V1. Le résumé exécutif ([executive-summary-qomit.md
 
 ---
 
+## Itération — Contexte marché
+
+Deuxième itération post-V1. La veille concurrentielle (Dashboard, Matrice) répond à « où en est-on face à chaque concurrent », mais l'outil ne rappelait pas *pourquoi* Qomit existe ni les chiffres de marché qui justifient l'effort de veille — ces éléments restaient uniquement dans le résumé exécutif statique. Cette itération ajoute un écran de référence pour les retrouver en un clic, toujours dans l'esprit « consultable en quelques secondes ».
+
+### Écran — Contexte marché
+- Accessible depuis un lien `Contexte marché` toujours visible dans l'en-tête (Dashboard, fiche détail ou matrice), indépendant des onglets Liste/Matrice.
+- Contenu, repris et condensé depuis [executive-summary-qomit.md](executive-summary-qomit.md) :
+  - **Intro produit** : positionnement « Le Gouverneur du Checkout », la logique tri-dimensionnelle (Conversion IA, Risque/Fraude, Gouvernance multi-marques) et le narratif Blue Ocean.
+  - **Le marché en chiffres** : tableau des 5 chiffres clés (taille de marché et CAGR, commandes perdues annuellement, part du mobile, croissance Stripe, TAM potentiel Qomit).
+  - **Sources** : origine des chiffres (Stripe TPV data, Baymard Institute, 6sense, market research 2026) et référence au résumé exécutif.
+- Contenu **statique et non éditable** (contrairement aux fiches concurrents) : c'est un rappel de contexte produit/marché, pas une donnée de veille à jour au fil de l'eau.
+- Volontairement condensé : ne reprend pas l'intégralité du résumé exécutif (roadmap marketing, personas GTM, moat concurrentiel...), hors sujet pour une consultation rapide avant un call.
+
+### Hors périmètre de cette itération
+- Pas d'édition du contenu depuis l'app (toute mise à jour du contexte marché passe par une modification du code/contenu, pas par l'UI).
+- Pas de lien entre ce contenu et les fiches concurrents (ex. pas de renvoi croisé automatique).
+
+---
+
 ## Interface et design
 
 ### Règles générales
@@ -196,3 +215,9 @@ Première itération post-V1. Le résumé exécutif ([executive-summary-qomit.md
 - **Points** : couleur = badge de niveau de menace (plein = Haute, clair = Moyenne, gris neutre = Basse), point pointillé/vide pour un concurrent non positionné, anneau accent autour du point sélectionné, léger agrandissement au survol.
 - **Panneau** : encadré (bordure fine, coins arrondis), défilement interne indépendant de la page ; état vide = message neutre invitant à cliquer un point ; les blocs Forces/Faiblesses s'empilent en une colonne (panneau plus étroit qu'une page complète).
 - **États** : liste vide → même état que l'onglet Liste (« Aucun concurrent pour l'instant. » + `Ajouter`).
+
+### Écran — Contexte marché
+- **Accès** : lien `Contexte marché` en texte discret dans l'en-tête, toujours visible (n'est pas une action liée aux concurrents, donc pas mêlé aux boutons `Archivés` / `Ajouter`).
+- **Hiérarchie** : titre produit → paragraphe d'intro (texte secondaire, plus grand que le corps habituel) → bloc « Les 3 dimensions Qomit » (liste à puces flèche) → tableau « Le marché en chiffres » → bloc Sources (texte tertiaire, discret).
+- **Tableau de chiffres** : mêmes conventions que le reste de l'outil — colonne « Valeur » en couleur d'accent pour capter l'œil, en-têtes discrets petites majuscules ; défilement horizontal seulement si la largeur ne suffit pas (jamais de troncature silencieuse d'un chiffre).
+- **Registre** : contenu non éditable — pas de contenteditable, pas de badge « non vérifié » (ce n'est pas une donnée de veille, mais un rappel de contexte déjà validé en amont).

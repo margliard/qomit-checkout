@@ -16,7 +16,7 @@
 
   var state = {
     competitors: [],
-    view: "dashboard", // "dashboard" | "detail"
+    view: "dashboard", // "dashboard" | "detail" | "context"
     currentId: null,
     showArchived: false,
     dashboardError: false,
@@ -457,12 +457,18 @@
   function render() {
     document.getElementById("view-dashboard").hidden = state.view !== "dashboard";
     document.getElementById("view-detail").hidden = state.view !== "detail";
+    document.getElementById("view-context").hidden = state.view !== "context";
     renderDashboardActionsVisibility();
     if (state.view === "dashboard") {
       renderDashboard();
-    } else {
+    } else if (state.view === "detail") {
       renderDetail();
     }
+  }
+
+  function openContext() {
+    state.view = "context";
+    render();
   }
 
   // ---------- Actions ----------
@@ -729,6 +735,8 @@
     });
 
     document.getElementById("btn-back").addEventListener("click", backToDashboard);
+    document.getElementById("btn-context").addEventListener("click", openContext);
+    document.getElementById("btn-context-back").addEventListener("click", backToDashboard);
 
     document.getElementById("dashboard-list").addEventListener("click", function (e) {
       var row = e.target.closest(".row");

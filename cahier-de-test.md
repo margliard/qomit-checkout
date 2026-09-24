@@ -83,6 +83,17 @@ Légende : ✅ PASS · ❌ FAIL
 | I12 | Ouvrir la fiche complète d'un concurrent via l'onglet Liste (pas via la matrice), utiliser `Rechercher` | Le comportement de la fiche plein écran (hors matrice) reste inchangé par rapport à la V1 | `Rechercher` fonctionne normalement, `Restaurer`/`Archiver` inchangés | ✅ |
 | I13 | Réduire la largeur de la fenêtre sous 640px avec le panneau ouvert | Le panneau passe sous la matrice au lieu d'être à côté | Empilement vertical confirmé | ✅ |
 
+## J. Contexte marché
+
+| # | Étapes | Résultat attendu | Résultat obtenu | Statut |
+|---|--------|-------------------|------------------|--------|
+| J1 | Depuis le Dashboard, cliquer `Contexte marché` | L'écran Contexte marché s'affiche : titre produit, intro, 3 dimensions Qomit, tableau de chiffres, sources | Écran affiché avec les 5 sections attendues | ✅ |
+| J2 | Vérifier le tableau « Le marché en chiffres » | Les 5 lignes du résumé exécutif sont reprises (taille de marché, commandes perdues, part mobile, croissance Stripe, TAM Qomit) avec leurs valeurs exactes | Les 5 métriques et valeurs correspondent à [executive-summary-qomit.md](executive-summary-qomit.md) | ✅ |
+| J3 | Cliquer `Dashboard` (lien retour) depuis Contexte marché | Retour au Dashboard (Liste) | Retour confirmé, `view-dashboard` réaffiché | ✅ |
+| J4 | Ouvrir `Contexte marché` depuis la fiche détail d'un concurrent (pas seulement depuis le Dashboard) | Le lien est accessible et fonctionne aussi depuis cet écran | Lien présent et fonctionnel dans l'en-tête, quelle que soit la vue active | ✅ |
+| J5 | Réduire la largeur de la fenêtre à ~310px (très étroit) | Le tableau de chiffres devient défilable horizontalement plutôt que de tronquer silencieusement une valeur | `.stats-table-scroll` avec `overflow-x: auto`, `scrollWidth` (691px) > largeur visible (276px), confirmé par lecture du DOM | ✅ |
+| J6 | Vérifier qu'aucun champ du Contexte marché n'est éditable | Contenu statique, pas de `contenteditable`, pas de badge « non vérifié » | Aucun `contenteditable` ni badge présent dans cet écran | ✅ |
+
 ## G. Hors périmètre — vérification d'absence
 
 | # | Vérification | Résultat attendu | Résultat obtenu | Statut |
@@ -104,7 +115,7 @@ Légende : ✅ PASS · ❌ FAIL
 
 ## Synthèse
 
-**50 cas de test exécutés, 50 réussis, 0 échec** (37 sur le périmètre V1 initial + 13 sur l'itération « Matrice de positionnement », incluant son évolution vers un panneau latéral).
+**56 cas de test exécutés, 56 réussis, 0 échec** (37 sur le périmètre V1 initial + 13 sur l'itération « Matrice de positionnement » + 6 sur l'itération « Contexte marché »).
 
 Deux corrections mineures d'affichage (nom de concurrent long qui débordait sur la date ; en-tête qui débordait sur petit écran) avaient déjà été détectées et corrigées lors de la construction initiale de la V1. Deux nouvelles corrections mineures ont été faites pendant le premier test de l'itération Matrice (voir I1 et I3 ci-dessus) — aucune anomalie non corrigée à date.
 
