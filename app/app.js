@@ -20,8 +20,14 @@
     currentId: null,
     showArchived: false,
     dashboardError: false,
-    firstLoad: true
+    firstLoad: true,
+    dashboardTab: "liste" // "liste" | "matrice"
   };
+
+  var MATRIX_AXES = [
+    { field: "axe_gouvernance", label: "Gouvernance multi-marques" },
+    { field: "axe_sophistication", label: "Sophistication IA" }
+  ];
 
   // ---------- Données ----------
 
@@ -98,10 +104,31 @@
     addBtn.style.display = state.showArchived ? "none" : "inline-flex";
     var toggleBtn = document.getElementById("btn-toggle-archived");
     toggleBtn.classList.toggle("is-active", state.showArchived);
+
+    // La matrice ne concerne que les concurrents actifs : on masque cet onglet
+    // en vue "Archivés" et on retombe sur la liste si besoin.
+    var tabMatrice = document.getElementById("tab-matrice");
+    tabMatrice.style.display = state.showArchived ? "none" : "inline-flex";
+    if (state.showArchived && state.dashboardTab === "matrice") {
+      state.dashboardTab = "liste";
+    }
+    document.getElementById("tab-liste").classList.toggle("is-active", state.dashboardTab === "liste");
+    document.getElementById("tab-liste").setAttribute("aria-selected", state.dashboardTab === "liste");
+    tabMatrice.classList.toggle("is-active", state.dashboardTab === "matrice");
+    tabMatrice.setAttribute("aria-selected", state.dashboardTab === "matrice");
   }
 
   function renderDashboard() {
     var list = document.getElementById("dashboard-list");
+    var matrix = document.getElementById("dashboard-matrix");
+    var showMatrix = state.dashboardTab === "matrice" && !state.showArchived;
+    list.hidden = showMatrix;
+    matrix.hidden = !showMatrix;
+
+    if (showMatrix) {
+      renderMatrix(matrix);
+      return;
+    }
 
     if (state.dashboardError) {
       list.innerHTML = '<div class="empty-state"><p>Impossible de charger les concurrents.</p></div>';
@@ -155,6 +182,63 @@
       '<div class="row-date">' + formatDate(c.date_derniere_maj) + "</div>" +
       "</div>"
     );
+  }
+
+  // ---------- Rendu : Matrice de positionnement ----------
+
+  // Zone de tracé en coordonnées SVG (viewBox 0 0 340 340), marges réservées
+  // aux labels d'axes.
+  var MATRIX_PLOT = { x0: 46, y0: 16, x1: 316, y1: 286 };
+
+  function axisToCoord(value) {
+    var v = value == null ? 5 : value;
+    if (v < 0) v = 0;
+    if (v > 10) v = 10;
+    return v / 10;
+  }
+
+  function matrixPointClass(c) {
+    if (c.axe_gouvernance == null || c.axe_sophistication == null) return "matrix-point matrix-point-unset";
+    return "matrix-point " + badgeClass(c.niveau_menace).replace("badge-", "matrix-point-");
+  }
+
+  function renderMatrix(container) {
+    var items = state.competitors.filter(function (c) {
+      return c.statut_fiche === "actif";
+    });
+
+    if (items.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>Aucun concurrent pour l’instant.</p>' +
+        '<button class="btn btn-primary" data-action="open-add" type="button">Ajouter</button></div>';
+      return;
+    }
+
+    var midX = MATRIX_PLOT.x0 + (MATRIX_PLOT.x1 - MATRIX_PLOT.x0) / 2;
+    var midY = MATRIX_PLOT.y0 + (MATRIX_PLOT.y1 - MATRIX_PLOT.y0) / 2;
+
+    var points = items
+      .map(function (c) {
+        var px = MATRIX_PLOT.x0 + axisToCoord(c.axe_gouvernance) * (MATRIX_PLOT.x1 - MATRIX_PLOT.x0);
+        var py = MATRIX_PLOT.y1 - axisToCoord(c.axe_sophistication) * (MATRIX_PLOT.y1 - MATRIX_PLOT.y0);
+        return (
+          '<g class="matrix-item" data-id="' + c.id + '" role="button" tabindex="0" aria-label="' + escapeHtml(c.nom) + '">' +
+          '<circle class="' + matrixPointClass(c) + '" cx="' + px + '" cy="' + py + '" r="7"></circle>' +
+          '<text class="matrix-label" x="' + px + '" y="' + (py - 11) + '" text-anchor="middle">' + escapeHtml(c.nom) + "</text>" +
+          "</g>"
+        );
+      })
+      .join("");
+
+    container.innerHTML =
+      '<svg class="matrix-svg" viewBox="0 0 340 320" role="img" aria-label="Matrice de positionnement des concurrents">' +
+      '<line class="matrix-axis" x1="' + MATRIX_PLOT.x0 + '" y1="' + MATRIX_PLOT.y1 + '" x2="' + MATRIX_PLOT.x1 + '" y2="' + MATRIX_PLOT.y1 + '"></line>' +
+      '<line class="matrix-axis" x1="' + MATRIX_PLOT.x0 + '" y1="' + MATRIX_PLOT.y0 + '" x2="' + MATRIX_PLOT.x0 + '" y2="' + MATRIX_PLOT.y1 + '"></line>' +
+      '<line class="matrix-gridline" x1="' + midX + '" y1="' + MATRIX_PLOT.y0 + '" x2="' + midX + '" y2="' + MATRIX_PLOT.y1 + '"></line>' +
+      '<line class="matrix-gridline" x1="' + MATRIX_PLOT.x0 + '" y1="' + midY + '" x2="' + MATRIX_PLOT.x1 + '" y2="' + midY + '"></line>' +
+      '<text class="matrix-axis-label" x="' + midX + '" y="308" text-anchor="middle">Gouvernance multi-marques →</text>' +
+      '<text class="matrix-axis-label" x="0" y="0" text-anchor="middle" transform="translate(14 ' + midY + ') rotate(-90)">Sophistication IA →</text>' +
+      points +
+      "</svg>";
   }
 
   // ---------- Rendu : Fiche détail ----------
@@ -214,6 +298,25 @@
       .join("");
   }
 
+  function renderMatrixPositionBlock(c) {
+    if (c.axe_gouvernance == null || c.axe_sophistication == null) {
+      return (
+        '<p class="field-empty-note">Non positionné sur la matrice.</p>' +
+        '<button class="btn-add-inline" data-action="init-matrix-position" type="button">+ Positionner</button>'
+      );
+    }
+    return MATRIX_AXES.map(function (axis) {
+      var value = c[axis.field];
+      return (
+        '<div class="matrix-slider-row">' +
+        '<label class="matrix-slider-label" for="slider-' + axis.field + '">' + axis.label + '</label>' +
+        '<input type="range" id="slider-' + axis.field + '" min="0" max="10" step="1" value="' + value + '" data-axis="' + axis.field + '">' +
+        '<span class="matrix-slider-value">' + value + "/10</span>" +
+        "</div>"
+      );
+    }).join("");
+  }
+
   function renderDetail() {
     var c = findCompetitor(state.currentId);
     if (!c) {
@@ -247,6 +350,10 @@
       '<div class="field-editable" contenteditable="true" data-field="positionnement" data-placeholder="Non renseigné.">' +
       escapeHtml(c.positionnement) +
       "</div></div>" +
+      '<div class="field-block">' +
+      '<div class="field-label">Position sur la matrice</div>' +
+      renderMatrixPositionBlock(c) +
+      "</div>" +
       '<div class="field-block-row">' +
       '<div class="field-block"><div class="field-label">Forces</div>' + renderListField(c.forces, "forces") + "</div>" +
       '<div class="field-block"><div class="field-label">Faiblesses</div>' + renderListField(c.faiblesses, "faiblesses") + "</div>" +
@@ -318,6 +425,8 @@
       faiblesses: [],
       pricing: "",
       sources: [],
+      axe_gouvernance: null,
+      axe_sophistication: null,
       statut_fiche: "actif",
       date_derniere_maj: today()
     };
@@ -407,6 +516,24 @@
     renderDetail();
   }
 
+  function initMatrixPosition() {
+    var c = findCompetitor(state.currentId);
+    if (!c) return;
+    c.axe_gouvernance = 5;
+    c.axe_sophistication = 5;
+    touch(c);
+    saveData();
+    renderDetail();
+  }
+
+  function setAxisValue(axis, value) {
+    var c = findCompetitor(state.currentId);
+    if (!c) return;
+    c[axis] = value;
+    touch(c);
+    saveData();
+  }
+
   function searchIA() {
     var c = findCompetitor(state.currentId);
     if (!c) return;
@@ -481,6 +608,26 @@
       render();
     });
 
+    document.getElementById("dashboard-tabs").addEventListener("click", function (e) {
+      var tab = e.target.closest("[data-tab]");
+      if (!tab) return;
+      state.dashboardTab = tab.dataset.tab;
+      render();
+    });
+
+    document.getElementById("dashboard-matrix").addEventListener("click", function (e) {
+      var item = e.target.closest(".matrix-item");
+      if (item) openDetail(item.dataset.id);
+    });
+    document.getElementById("dashboard-matrix").addEventListener("keydown", function (e) {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      var item = e.target.closest(".matrix-item");
+      if (item) {
+        e.preventDefault();
+        openDetail(item.dataset.id);
+      }
+    });
+
     document.getElementById("btn-back").addEventListener("click", backToDashboard);
 
     document.getElementById("dashboard-list").addEventListener("click", function (e) {
@@ -508,12 +655,22 @@
       else if (action === "flag-source") flagSource(Number(btn.dataset.index));
       else if (action === "archive-toggle") archiveToggle();
       else if (action === "search-ia") searchIA();
+      else if (action === "init-matrix-position") initMatrixPosition();
+    });
+
+    document.addEventListener("input", function (e) {
+      if (e.target.matches("input[type='range'][data-axis]")) {
+        var row = e.target.closest(".matrix-slider-row");
+        row.querySelector(".matrix-slider-value").textContent = e.target.value + "/10";
+      }
     });
 
     document.addEventListener("change", function (e) {
       if (e.target.matches(".menace-select")) {
         updateCompetitor(state.currentId, { niveau_menace: e.target.value });
         renderDetail();
+      } else if (e.target.matches("input[type='range'][data-axis]")) {
+        setAxisValue(e.target.dataset.axis, Number(e.target.value));
       }
     });
 

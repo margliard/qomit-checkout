@@ -23,6 +23,8 @@ const SEED_COMPETITORS = [
       { info: "Croissance TPV Stripe +34% YoY d'après les données marché 2026.", lien_ou_texte: "Résumé exécutif Qomit", date: "2026-09-23", statut: "verifie" },
       { info: "Aucune annonce publique d'une offre de gouvernance multi-marques à ce jour.", lien_ou_texte: "", date: "2026-09-20", statut: "non_verifie" }
     ],
+    axe_gouvernance: 2,
+    axe_sophistication: 5,
     statut_fiche: "actif",
     date_derniere_maj: "2026-09-23"
   },
@@ -44,6 +46,8 @@ const SEED_COMPETITORS = [
     sources: [
       { info: "Délai d'intégration estimé entre 6 et 12 mois pour des comptes enterprise.", lien_ou_texte: "Résumé exécutif Qomit", date: "2026-09-15", statut: "verifie" }
     ],
+    axe_gouvernance: 3,
+    axe_sophistication: 3,
     statut_fiche: "actif",
     date_derniere_maj: "2026-09-15"
   },
@@ -64,6 +68,8 @@ const SEED_COMPETITORS = [
     sources: [
       { info: "Positionnement principalement ISV/Enterprise, pas de segment multi-marques dédié identifié.", lien_ou_texte: "Résumé exécutif Qomit", date: "2026-09-10", statut: "verifie" }
     ],
+    axe_gouvernance: 2,
+    axe_sophistication: 4,
     statut_fiche: "actif",
     date_derniere_maj: "2026-09-10"
   },
@@ -84,6 +90,8 @@ const SEED_COMPETITORS = [
     sources: [
       { info: "Aucune offre de gouvernance multi-marques identifiée à date, focus fraude confirmé.", lien_ou_texte: "Résumé exécutif Qomit", date: "2026-09-20", statut: "verifie" }
     ],
+    axe_gouvernance: 2,
+    axe_sophistication: 8,
     statut_fiche: "actif",
     date_derniere_maj: "2026-09-20"
   },
@@ -104,6 +112,8 @@ const SEED_COMPETITORS = [
     sources: [
       { info: "Positionné comme « Legacy » dans la matrice concurrentielle interne.", lien_ou_texte: "Résumé exécutif Qomit", date: "2026-08-30", statut: "verifie" }
     ],
+    axe_gouvernance: 1,
+    axe_sophistication: 2,
     statut_fiche: "actif",
     date_derniere_maj: "2026-08-30"
   }
