@@ -282,25 +282,54 @@ button, input, textarea, select {
 
 .matrix-wrap[hidden] { display: none; }
 
+.matrix-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.matrix-plot-col { flex: 1 1 340px; min-width: 280px; }
+.matrix-panel-col { flex: 1 1 320px; min-width: 280px; }
+
 .matrix-svg {
   width: 100%;
   height: auto;
   overflow: visible;
 }
 
-.matrix-axis { stroke: var(--color-border); stroke-width: 1.5; }
-.matrix-gridline { stroke: var(--color-border); stroke-width: 1; stroke-dasharray: 3 4; }
-
-.matrix-axis-label {
-  fill: var(--color-text-tertiary);
-  font-size: 10px;
-  font-weight: 600;
+.matrix-plot-bg { fill: var(--color-surface); stroke: none; }
+.matrix-quadrant-target { fill: var(--color-accent-tint); opacity: 0.5; }
+.matrix-quadrant-note {
+  fill: var(--color-accent-dark);
+  font-size: 9px;
+  font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.matrix-axis { stroke: var(--color-text-tertiary); stroke-width: 1.2; }
+.matrix-gridline { stroke: var(--color-border); stroke-width: 1; stroke-dasharray: 2 4; }
+
+.matrix-axis-label {
+  fill: var(--color-text-secondary);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.matrix-tick {
+  fill: var(--color-text-tertiary);
+  font-size: 9px;
+  font-style: italic;
 }
 
 .matrix-item { cursor: pointer; }
 .matrix-item:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.matrix-item .matrix-point { transition: r 0.12s ease; }
+.matrix-item:hover .matrix-point { r: 8.5; }
 
 .matrix-point { stroke-width: 2; }
 .matrix-point-haute { fill: var(--color-accent); stroke: var(--color-accent); }
@@ -308,11 +337,47 @@ button, input, textarea, select {
 .matrix-point-basse { fill: var(--color-neutral-badge-bg); stroke: var(--color-neutral-badge-text); }
 .matrix-point-unset { fill: #FFFFFF; stroke: var(--color-text-tertiary); stroke-dasharray: 2 2; }
 
+.matrix-point-ring {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+}
+
 .matrix-label {
   fill: var(--color-text);
   font-size: 11px;
   font-weight: 600;
 }
+
+/* Panneau latéral (fiche détail ouverte depuis la matrice) */
+
+.matrix-panel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  max-height: 640px;
+  overflow-y: auto;
+}
+
+.matrix-panel-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  padding: 24px;
+}
+.matrix-panel-empty p { margin: 0; }
+
+.matrix-panel-header { margin-bottom: 12px; }
+.matrix-panel-header .link-back { margin-bottom: 0; }
+
+.matrix-panel-body .detail-header { margin-bottom: 24px; }
+.matrix-panel-body .editable-title { font-size: 20px; }
+.matrix-panel-body .field-block { margin-bottom: 24px; }
+.matrix-panel-body .field-block-row { grid-template-columns: 1fr; gap: 20px; }
 
 .matrix-slider-row {
   display: grid;
@@ -324,6 +389,11 @@ button, input, textarea, select {
 .matrix-slider-label { font-size: 13px; color: var(--color-text-secondary); }
 .matrix-slider-row input[type="range"] { accent-color: var(--color-accent); width: 100%; }
 .matrix-slider-value { font-size: 12px; color: var(--color-text-tertiary); min-width: 32px; text-align: right; }
+
+@media (max-width: 640px) {
+  .matrix-layout { flex-direction: column; }
+  .matrix-panel-col { width: 100%; }
+}
 
 /* Empty / loading / error states */
 

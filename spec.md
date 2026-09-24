@@ -125,12 +125,20 @@ Première itération post-V1. Le résumé exécutif ([executive-summary-qomit.md
 ### Écran — Dashboard, onglet Matrice
 - Le Dashboard gagne deux onglets : **Liste** (comportement V1 inchangé) et **Matrice**.
 - L'onglet Matrice n'est proposé qu'en vue concurrents actifs (masqué quand « Archivés » est actif — la comparaison ne porte que sur la veille en cours).
-- Nuage de points : un point par concurrent actif, positionné selon ses deux axes, étiqueté par son nom, cliquable (ouvre la fiche détail, comme une ligne de la liste).
-- Couleur du point = couleur du badge de niveau de menace du concurrent (cohérence avec la liste).
+- Nuage de points : un point par concurrent actif, positionné selon ses deux axes, étiqueté par son nom.
+- Couleur du point = couleur du badge de niveau de menace du concurrent (cohérence avec la liste). Le point du concurrent actuellement ouvert dans le panneau (voir ci-dessous) porte un anneau de sélection.
 - Un concurrent dont les deux axes ne sont pas encore renseignés apparaît au centre avec un style visuellement distinct (point vide/pointillé), pour ne pas laisser croire à un positionnement réel.
+- Repères visuels : fond de zone de tracé, repères "Faible / Forte" à chaque extrémité d'axe, léger repère de teinte "Zone cible Qomit" dans le quadrant haut-droit (forte gouvernance × forte sophistication), en écho au positionnement du résumé exécutif — Qomit lui-même n'est pas un point de données, juste une zone annotée.
+
+### Écran — Dashboard, panneau latéral (vue Matrice)
+- Cliquer un point ouvre la fiche du concurrent dans un **panneau latéral**, à droite de la matrice (écran divisé en deux), plutôt que de naviguer vers une page plein écran — on garde la matrice sous les yeux pendant qu'on consulte ou ajuste une fiche.
+- Le panneau reprend exactement les mêmes blocs et actions que la fiche détail plein écran (voir ci-dessous), y compris le bloc « Position sur la matrice » : déplacer un curseur y repositionne le point correspondant en direct sur la matrice.
+- Action `Fermer` en haut du panneau pour revenir à l'état "Cliquez un point pour voir la fiche du concurrent."
+- Archiver un concurrent depuis le panneau referme le panneau et retire son point de la matrice, sans quitter l'onglet Matrice.
+- En dessous de 640px de large, le panneau passe sous la matrice au lieu d'être à côté (empilement vertical).
 
 ### Écran — Fiche détail, bloc « Position sur la matrice »
-- Nouveau bloc, juste après Positionnement : deux curseurs (0-10) « Gouvernance multi-marques » et « Sophistication IA ».
+- Nouveau bloc, juste après Positionnement (présent à la fois en plein écran et dans le panneau latéral) : deux curseurs (0-10) « Gouvernance multi-marques » et « Sophistication IA ».
 - Tant qu'aucun des deux axes n'est renseigné, le bloc affiche « Non positionné sur la matrice. » + action `+ Positionner` (initialise les deux axes au centre, 5/10, à ajuster ensuite).
 - Chaque curseur sauvegarde sa valeur au relâchement, comme les autres champs de la fiche.
 
@@ -183,6 +191,8 @@ Première itération post-V1. Le résumé exécutif ([executive-summary-qomit.md
 
 ### Écran — Dashboard, onglet Matrice
 - **Onglets** : `Liste` / `Matrice`, sobres (soulignement accent sur l'onglet actif), pas d'icône.
-- **Axes** : labels discrets (texte tertiaire, petites majuscules), pas de graduation chiffrée — l'usage est comparatif, pas analytique.
-- **Points** : couleur = badge de niveau de menace (plein = Haute, clair = Moyenne, gris neutre = Basse), point pointillé/vide pour un concurrent non positionné.
+- **Mise en page** : deux colonnes (matrice à gauche, panneau fiche à droite), qui s'empilent verticalement sous 640px de large.
+- **Axes** : labels discrets (texte tertiaire, petites majuscules), repères "Faible / Forte" en italique à chaque extrémité — pas de graduation chiffrée, l'usage est comparatif, pas analytique.
+- **Points** : couleur = badge de niveau de menace (plein = Haute, clair = Moyenne, gris neutre = Basse), point pointillé/vide pour un concurrent non positionné, anneau accent autour du point sélectionné, léger agrandissement au survol.
+- **Panneau** : encadré (bordure fine, coins arrondis), défilement interne indépendant de la page ; état vide = message neutre invitant à cliquer un point ; les blocs Forces/Faiblesses s'empilent en une colonne (panneau plus étroit qu'une page complète).
 - **États** : liste vide → même état que l'onglet Liste (« Aucun concurrent pour l'instant. » + `Ajouter`).

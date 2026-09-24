@@ -70,13 +70,18 @@ Légende : ✅ PASS · ❌ FAIL
 | # | Étapes | Résultat attendu | Résultat obtenu | Statut |
 |---|--------|-------------------|------------------|--------|
 | I1 | Sur le Dashboard, cliquer l'onglet `Matrice` | Nuage de points affiché, un point par concurrent actif, étiqueté par son nom, deux axes labellisés (Gouvernance multi-marques / Sophistication IA) | Nuage affiché avec les 5 concurrents actifs, axes labellisés, liste masquée (bug de CSS `[hidden]` détecté et corrigé pendant ce test) | ✅ |
-| I2 | Cliquer sur le point d'un concurrent (ex. Stripe) | La fiche détail du concurrent s'ouvre | Fiche « Stripe » ouverte après clic sur le point | ✅ |
+| I2 | Cliquer sur le point d'un concurrent (ex. Stripe) | La fiche s'ouvre dans un panneau latéral à droite de la matrice (écran divisé en deux), la matrice reste visible et affichée à gauche | Panneau ouvert avec la fiche « Stripe », matrice toujours visible, point Stripe entouré d'un anneau de sélection | ✅ |
 | I3 | Ouvrir la fiche d'un concurrent tout juste créé (axes non renseignés) | Bloc « Position sur la matrice » affiche « Non positionné sur la matrice. » + bouton `+ Positionner` ; sur la matrice, son point est vide/pointillé, centré | Confirmé sur « Worldline » (texte mal stylé détecté et corrigé pendant ce test, cf. `.field-empty-note`) | ✅ |
 | I4 | Cliquer `+ Positionner` sur une fiche non positionnée | Deux curseurs apparaissent, valeur initiale 5/10 chacun | Curseurs « Gouvernance multi-marques » et « Sophistication IA » à 5/10 | ✅ |
 | I5 | Déplacer un curseur (ex. Gouvernance multi-marques de Stripe à 8) | La valeur affichée à côté du curseur se met à jour en direct, la donnée est sauvegardée | Libellé passé à « 8/10 », `axe_gouvernance: 8` confirmé dans les données sauvegardées, `date_derniere_maj` mise à jour | ✅ |
 | I6 | Revenir sur l'onglet Matrice après avoir modifié un axe | La position du point reflète la nouvelle valeur | Point Stripe déplacé vers la droite après passage de Gouvernance 2→8 | ✅ |
 | I7 | Comparer la couleur des points à leur badge de niveau de menace | Haute = point plein accent, Moyenne = point clair à bordure accent, Basse = point gris neutre | Stripe (Haute) plein, Adyen (Moyenne) clair à bordure, Checkout.com/PayPal (Basse) gris neutre | ✅ |
 | I8 | Basculer sur `Archivés` alors que l'onglet Matrice est actif | L'onglet Matrice disparaît, la vue retombe automatiquement sur Liste | Onglet Matrice masqué, onglet Liste actif, aucun concurrent archivé affiché comme attendu | ✅ |
+| I9 | Depuis le panneau latéral ouvert sur Stripe, cliquer `Rechercher` | Le bouton se désactive (« Recherche… »), une nouvelle source « Non vérifié » apparaît dans le panneau après l'attente, sans affecter la vue plein écran | Comportement identique à la fiche plein écran, scoping correct (aucune interférence avec un id dupliqué) | ✅ |
+| I10 | Depuis le panneau latéral, cliquer `Archiver` | Le panneau se referme (retour à l'état « Cliquez un point... »), le point disparaît de la matrice, on reste sur l'onglet Matrice (pas de retour à Liste) | Comportement confirmé ; le concurrent réapparaît correctement dans « Archivés » côté Liste avec toutes ses données intactes | ✅ |
+| I11 | Depuis le panneau, cliquer `Fermer` | Le panneau se referme, l'anneau de sélection disparaît de la matrice, aucune donnée n'est modifiée | Panneau revenu à l'état vide, point non modifié | ✅ |
+| I12 | Ouvrir la fiche complète d'un concurrent via l'onglet Liste (pas via la matrice), utiliser `Rechercher` | Le comportement de la fiche plein écran (hors matrice) reste inchangé par rapport à la V1 | `Rechercher` fonctionne normalement, `Restaurer`/`Archiver` inchangés | ✅ |
+| I13 | Réduire la largeur de la fenêtre sous 640px avec le panneau ouvert | Le panneau passe sous la matrice au lieu d'être à côté | Empilement vertical confirmé | ✅ |
 
 ## G. Hors périmètre — vérification d'absence
 
@@ -99,9 +104,9 @@ Légende : ✅ PASS · ❌ FAIL
 
 ## Synthèse
 
-**45 cas de test exécutés, 45 réussis, 0 échec** (37 sur le périmètre V1 initial + 8 sur l'itération « Matrice de positionnement »).
+**50 cas de test exécutés, 50 réussis, 0 échec** (37 sur le périmètre V1 initial + 13 sur l'itération « Matrice de positionnement », incluant son évolution vers un panneau latéral).
 
-Deux corrections mineures d'affichage (nom de concurrent long qui débordait sur la date ; en-tête qui débordait sur petit écran) avaient déjà été détectées et corrigées lors de la construction initiale de la V1. Deux nouvelles corrections mineures ont été faites pendant le test de l'itération Matrice (voir I1 et I3 ci-dessus) — aucune anomalie non corrigée à date.
+Deux corrections mineures d'affichage (nom de concurrent long qui débordait sur la date ; en-tête qui débordait sur petit écran) avaient déjà été détectées et corrigées lors de la construction initiale de la V1. Deux nouvelles corrections mineures ont été faites pendant le premier test de l'itération Matrice (voir I1 et I3 ci-dessus) — aucune anomalie non corrigée à date.
 
 **Non couvert par ce cahier** (hors périmètre volontaire de la V1, donc non testé car non censé exister) : authentification, export, notifications, gestion de conflits entre sources, hébergement multi-appareil — voir la section « Hors périmètre V1 » de [spec.md](spec.md).
 

@@ -21,7 +21,8 @@
     showArchived: false,
     dashboardError: false,
     firstLoad: true,
-    dashboardTab: "liste" // "liste" | "matrice"
+    dashboardTab: "liste", // "liste" | "matrice"
+    matrixOpenId: null // id du concurrent ouvert dans le panneau latéral de la matrice
   };
 
   var MATRIX_AXES = [
@@ -186,9 +187,10 @@
 
   // ---------- Rendu : Matrice de positionnement ----------
 
-  // Zone de tracé en coordonnées SVG (viewBox 0 0 340 340), marges réservées
-  // aux labels d'axes.
-  var MATRIX_PLOT = { x0: 46, y0: 16, x1: 316, y1: 286 };
+  // Zone de tracé en coordonnées SVG, marges réservées aux labels d'axes et
+  // aux repères "Faible / Forte".
+  var MATRIX_PLOT = { x0: 66, y0: 30, x1: 372, y1: 276 };
+  var MATRIX_VIEWBOX = "0 0 392 320";
 
   function axisToCoord(value) {
     var v = value == null ? 5 : value;
@@ -198,8 +200,14 @@
   }
 
   function matrixPointClass(c) {
-    if (c.axe_gouvernance == null || c.axe_sophistication == null) return "matrix-point matrix-point-unset";
-    return "matrix-point " + badgeClass(c.niveau_menace).replace("badge-", "matrix-point-");
+    var cls = "matrix-point ";
+    if (c.axe_gouvernance == null || c.axe_sophistication == null) {
+      cls += "matrix-point-unset";
+    } else {
+      cls += badgeClass(c.niveau_menace).replace("badge-", "matrix-point-");
+    }
+    if (c.id === state.matrixOpenId) cls += " is-selected";
+    return cls;
   }
 
   function renderMatrix(container) {
@@ -220,25 +228,65 @@
       .map(function (c) {
         var px = MATRIX_PLOT.x0 + axisToCoord(c.axe_gouvernance) * (MATRIX_PLOT.x1 - MATRIX_PLOT.x0);
         var py = MATRIX_PLOT.y1 - axisToCoord(c.axe_sophistication) * (MATRIX_PLOT.y1 - MATRIX_PLOT.y0);
+        var labelY = py - 13 < MATRIX_PLOT.y0 + 8 ? py + 20 : py - 13;
+        var ring = c.id === state.matrixOpenId
+          ? '<circle class="matrix-point-ring" cx="' + px + '" cy="' + py + '" r="12"></circle>'
+          : "";
         return (
-          '<g class="matrix-item" data-id="' + c.id + '" role="button" tabindex="0" aria-label="' + escapeHtml(c.nom) + '">' +
+          '<g class="matrix-item" data-id="' + c.id + '" role="button" tabindex="0" aria-label="Voir la fiche ' + escapeHtml(c.nom) + '">' +
+          ring +
           '<circle class="' + matrixPointClass(c) + '" cx="' + px + '" cy="' + py + '" r="7"></circle>' +
-          '<text class="matrix-label" x="' + px + '" y="' + (py - 11) + '" text-anchor="middle">' + escapeHtml(c.nom) + "</text>" +
+          '<text class="matrix-label" x="' + px + '" y="' + labelY + '" text-anchor="middle">' + escapeHtml(c.nom) + "</text>" +
           "</g>"
         );
       })
       .join("");
 
-    container.innerHTML =
-      '<svg class="matrix-svg" viewBox="0 0 340 320" role="img" aria-label="Matrice de positionnement des concurrents">' +
-      '<line class="matrix-axis" x1="' + MATRIX_PLOT.x0 + '" y1="' + MATRIX_PLOT.y1 + '" x2="' + MATRIX_PLOT.x1 + '" y2="' + MATRIX_PLOT.y1 + '"></line>' +
-      '<line class="matrix-axis" x1="' + MATRIX_PLOT.x0 + '" y1="' + MATRIX_PLOT.y0 + '" x2="' + MATRIX_PLOT.x0 + '" y2="' + MATRIX_PLOT.y1 + '"></line>' +
+    var svg =
+      '<svg class="matrix-svg" viewBox="' + MATRIX_VIEWBOX + '" role="img" aria-label="Matrice de positionnement des concurrents">' +
+      '<rect class="matrix-plot-bg" x="' + MATRIX_PLOT.x0 + '" y="' + MATRIX_PLOT.y0 + '" width="' + (MATRIX_PLOT.x1 - MATRIX_PLOT.x0) + '" height="' + (MATRIX_PLOT.y1 - MATRIX_PLOT.y0) + '" rx="8"></rect>' +
+      '<rect class="matrix-quadrant-target" x="' + midX + '" y="' + MATRIX_PLOT.y0 + '" width="' + (MATRIX_PLOT.x1 - midX) + '" height="' + (midY - MATRIX_PLOT.y0) + '"></rect>' +
       '<line class="matrix-gridline" x1="' + midX + '" y1="' + MATRIX_PLOT.y0 + '" x2="' + midX + '" y2="' + MATRIX_PLOT.y1 + '"></line>' +
       '<line class="matrix-gridline" x1="' + MATRIX_PLOT.x0 + '" y1="' + midY + '" x2="' + MATRIX_PLOT.x1 + '" y2="' + midY + '"></line>' +
-      '<text class="matrix-axis-label" x="' + midX + '" y="308" text-anchor="middle">Gouvernance multi-marques →</text>' +
-      '<text class="matrix-axis-label" x="0" y="0" text-anchor="middle" transform="translate(14 ' + midY + ') rotate(-90)">Sophistication IA →</text>' +
+      '<line class="matrix-axis" x1="' + MATRIX_PLOT.x0 + '" y1="' + MATRIX_PLOT.y1 + '" x2="' + MATRIX_PLOT.x1 + '" y2="' + MATRIX_PLOT.y1 + '"></line>' +
+      '<line class="matrix-axis" x1="' + MATRIX_PLOT.x0 + '" y1="' + MATRIX_PLOT.y0 + '" x2="' + MATRIX_PLOT.x0 + '" y2="' + MATRIX_PLOT.y1 + '"></line>' +
+      '<text class="matrix-quadrant-note" x="' + (MATRIX_PLOT.x1 - 8) + '" y="' + (MATRIX_PLOT.y0 + 16) + '" text-anchor="end">Zone cible Qomit</text>' +
+      '<text class="matrix-tick" x="' + MATRIX_PLOT.x0 + '" y="' + (MATRIX_PLOT.y1 + 16) + '" text-anchor="start">Faible</text>' +
+      '<text class="matrix-tick" x="' + MATRIX_PLOT.x1 + '" y="' + (MATRIX_PLOT.y1 + 16) + '" text-anchor="end">Forte</text>' +
+      '<text class="matrix-axis-label" x="' + midX + '" y="' + (MATRIX_PLOT.y1 + 34) + '" text-anchor="middle">Gouvernance multi-marques</text>' +
+      '<text class="matrix-tick" text-anchor="start" transform="translate(18 ' + MATRIX_PLOT.y1 + ') rotate(-90)">Faible</text>' +
+      '<text class="matrix-tick" text-anchor="end" transform="translate(18 ' + MATRIX_PLOT.y0 + ') rotate(-90)">Forte</text>' +
+      '<text class="matrix-axis-label" x="0" y="0" text-anchor="middle" transform="translate(2 ' + midY + ') rotate(-90)">Sophistication IA</text>' +
       points +
       "</svg>";
+
+    var openCompetitor = state.matrixOpenId ? findCompetitor(state.matrixOpenId) : null;
+    if (state.matrixOpenId && (!openCompetitor || openCompetitor.statut_fiche !== "actif")) {
+      state.matrixOpenId = null;
+      openCompetitor = null;
+    }
+
+    var panel;
+    if (openCompetitor) {
+      panel =
+        '<div class="matrix-panel">' +
+        '<div class="matrix-panel-header">' +
+        '<button class="link-back" data-action="close-matrix-panel" type="button">' +
+        '<svg class="icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">' +
+        '<path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
+        " Fermer</button>" +
+        "</div>" +
+        '<div class="matrix-panel-body">' + buildDetailMarkup(openCompetitor, "matrix-") + "</div>" +
+        "</div>";
+    } else {
+      panel = '<div class="matrix-panel matrix-panel-empty"><p>Cliquez un point pour voir la fiche du concurrent.</p></div>';
+    }
+
+    container.innerHTML =
+      '<div class="matrix-layout">' +
+      '<div class="matrix-plot-col">' + svg + "</div>" +
+      '<div class="matrix-panel-col">' + panel + "</div>" +
+      "</div>";
   }
 
   // ---------- Rendu : Fiche détail ----------
@@ -298,7 +346,7 @@
       .join("");
   }
 
-  function renderMatrixPositionBlock(c) {
+  function renderMatrixPositionBlock(c, prefix) {
     if (c.axe_gouvernance == null || c.axe_sophistication == null) {
       return (
         '<p class="field-empty-note">Non positionné sur la matrice.</p>' +
@@ -307,26 +355,23 @@
     }
     return MATRIX_AXES.map(function (axis) {
       var value = c[axis.field];
+      var id = prefix + "slider-" + axis.field;
       return (
         '<div class="matrix-slider-row">' +
-        '<label class="matrix-slider-label" for="slider-' + axis.field + '">' + axis.label + '</label>' +
-        '<input type="range" id="slider-' + axis.field + '" min="0" max="10" step="1" value="' + value + '" data-axis="' + axis.field + '">' +
+        '<label class="matrix-slider-label" for="' + id + '">' + axis.label + '</label>' +
+        '<input type="range" id="' + id + '" min="0" max="10" step="1" value="' + value + '" data-axis="' + axis.field + '">' +
         '<span class="matrix-slider-value">' + value + "/10</span>" +
         "</div>"
       );
     }).join("");
   }
 
-  function renderDetail() {
-    var c = findCompetitor(state.currentId);
-    if (!c) {
-      state.view = "dashboard";
-      render();
-      return;
-    }
-
-    var container = document.getElementById("detail-content");
-    container.innerHTML =
+  // Construit le HTML d'une fiche concurrent complète. Réutilisé à la fois par
+  // la vue détail plein écran et par le panneau latéral de la vue Matrice —
+  // `prefix` évite les id dupliqués si les deux sont présents dans le DOM.
+  function buildDetailMarkup(c, prefix) {
+    prefix = prefix || "";
+    return (
       '<div class="detail-header">' +
       '<div class="detail-title-row">' +
       '<h1 class="editable-title" contenteditable="true" data-field="nom">' + escapeHtml(c.nom) + "</h1>" +
@@ -352,7 +397,7 @@
       "</div></div>" +
       '<div class="field-block">' +
       '<div class="field-label">Position sur la matrice</div>' +
-      renderMatrixPositionBlock(c) +
+      renderMatrixPositionBlock(c, prefix) +
       "</div>" +
       '<div class="field-block-row">' +
       '<div class="field-block"><div class="field-label">Forces</div>' + renderListField(c.forces, "forces") + "</div>" +
@@ -366,16 +411,45 @@
       '<div class="field-block">' +
       '<div class="section-header-row">' +
       '<div class="field-label">Sources</div>' +
-      '<button class="btn btn-secondary btn-sm" id="btn-search" data-action="search-ia" type="button">' +
+      '<button class="btn btn-secondary btn-sm" data-action="search-ia" type="button">' +
       '<svg class="icon" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">' +
       '<circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6" fill="none"/>' +
       '<path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
       "</svg> Rechercher</button>" +
       "</div>" +
-      '<div class="search-status" id="search-status"></div>' +
+      '<div class="search-status"></div>' +
       renderSources(c.sources) +
       '<button class="btn-add-inline" data-action="add-source" type="button">+ Ajouter une source</button>' +
-      "</div>";
+      "</div>"
+    );
+  }
+
+  function renderDetail() {
+    var c = findCompetitor(state.currentId);
+    if (!c) {
+      state.view = "dashboard";
+      render();
+      return;
+    }
+    document.getElementById("detail-content").innerHTML = buildDetailMarkup(c, "");
+  }
+
+  // Racine DOM affichant actuellement la fiche du concurrent en cours d'édition
+  // (state.currentId) : la vue détail plein écran, ou le panneau de la matrice.
+  function activeDetailRoot() {
+    if (state.view === "detail") return document.getElementById("detail-content");
+    if (state.dashboardTab === "matrice" && state.matrixOpenId) {
+      var panel = document.querySelector("#dashboard-matrix .matrix-panel-body");
+      if (panel) return panel;
+    }
+    return null;
+  }
+
+  // Rafraîchit la ou les surfaces qui affichent la fiche courante après une
+  // modification de donnée (vue détail plein écran et/ou panneau matrice).
+  function refreshDetailSurfaces() {
+    if (state.view === "detail") renderDetail();
+    if (state.dashboardTab === "matrice") renderMatrix(document.getElementById("dashboard-matrix"));
   }
 
   // ---------- Rendu global ----------
@@ -403,6 +477,18 @@
     state.view = "dashboard";
     state.currentId = null;
     render();
+  }
+
+  function openMatrixDetail(id) {
+    state.currentId = id;
+    state.matrixOpenId = id;
+    renderMatrix(document.getElementById("dashboard-matrix"));
+  }
+
+  function closeMatrixDetail() {
+    state.matrixOpenId = null;
+    state.currentId = null;
+    renderMatrix(document.getElementById("dashboard-matrix"));
   }
 
   function updateCompetitor(id, patch) {
@@ -439,18 +525,28 @@
   function archiveToggle() {
     var c = findCompetitor(state.currentId);
     if (!c) return;
+    var openedFromMatrix = state.view === "dashboard" && state.dashboardTab === "matrice" && state.matrixOpenId === c.id;
     c.statut_fiche = c.statut_fiche === "actif" ? "archive" : "actif";
     touch(c);
     saveData();
-    backToDashboard();
+    if (openedFromMatrix) {
+      // Un concurrent archivé disparaît de la matrice : on ferme le panneau
+      // et on reste sur l'onglet Matrice plutôt que de retourner à la Liste.
+      state.matrixOpenId = null;
+      state.currentId = null;
+      renderMatrix(document.getElementById("dashboard-matrix"));
+    } else {
+      backToDashboard();
+    }
   }
 
   function addListItem(field) {
     var c = findCompetitor(state.currentId);
     if (!c) return;
     c[field].push("");
-    renderDetail();
-    var lastInput = document.querySelector('.list-item-text[data-field="' + field + '"][data-index="' + (c[field].length - 1) + '"]');
+    refreshDetailSurfaces();
+    var root = activeDetailRoot();
+    var lastInput = root && root.querySelector('.list-item-text[data-field="' + field + '"][data-index="' + (c[field].length - 1) + '"]');
     if (lastInput) lastInput.focus();
   }
 
@@ -460,7 +556,7 @@
     c[field].splice(index, 1);
     touch(c);
     saveData();
-    renderDetail();
+    refreshDetailSurfaces();
   }
 
   function saveListItemText(field, index, value) {
@@ -474,7 +570,7 @@
     }
     touch(c);
     saveData();
-    renderDetail();
+    refreshDetailSurfaces();
   }
 
   function addSource() {
@@ -483,8 +579,9 @@
     c.sources.push({ info: "", lien_ou_texte: "", date: today(), statut: "verifie" });
     touch(c);
     saveData();
-    renderDetail();
-    var lastInfo = document.querySelector('.source-info[data-index="' + (c.sources.length - 1) + '"]');
+    refreshDetailSurfaces();
+    var root = activeDetailRoot();
+    var lastInfo = root && root.querySelector('.source-info[data-index="' + (c.sources.length - 1) + '"]');
     if (lastInfo) lastInfo.focus();
   }
 
@@ -494,7 +591,7 @@
     c.sources.splice(index, 1);
     touch(c);
     saveData();
-    renderDetail();
+    refreshDetailSurfaces();
   }
 
   function flagSource(index) {
@@ -503,7 +600,7 @@
     c.sources[index].statut = "non_verifie";
     touch(c);
     saveData();
-    renderDetail();
+    refreshDetailSurfaces();
   }
 
   function saveSourceField(index, subfield, value) {
@@ -513,7 +610,7 @@
     c.sources[index].statut = "verifie";
     touch(c);
     saveData();
-    renderDetail();
+    refreshDetailSurfaces();
   }
 
   function initMatrixPosition() {
@@ -523,7 +620,7 @@
     c.axe_sophistication = 5;
     touch(c);
     saveData();
-    renderDetail();
+    refreshDetailSurfaces();
   }
 
   function setAxisValue(axis, value) {
@@ -532,13 +629,16 @@
     c[axis] = value;
     touch(c);
     saveData();
+    refreshDetailSurfaces();
   }
 
   function searchIA() {
     var c = findCompetitor(state.currentId);
     if (!c) return;
-    var btn = document.getElementById("btn-search");
-    var status = document.getElementById("search-status");
+    var root = activeDetailRoot();
+    if (!root) return;
+    var btn = root.querySelector('[data-action="search-ia"]');
+    var status = root.querySelector(".search-status");
     if (!btn) return;
     btn.disabled = true;
     btn.innerHTML = "Recherche…";
@@ -566,7 +666,7 @@
       });
       touch(c);
       saveData();
-      renderDetail();
+      refreshDetailSurfaces();
     }, 900);
   }
 
@@ -617,14 +717,14 @@
 
     document.getElementById("dashboard-matrix").addEventListener("click", function (e) {
       var item = e.target.closest(".matrix-item");
-      if (item) openDetail(item.dataset.id);
+      if (item) openMatrixDetail(item.dataset.id);
     });
     document.getElementById("dashboard-matrix").addEventListener("keydown", function (e) {
       if (e.key !== "Enter" && e.key !== " ") return;
       var item = e.target.closest(".matrix-item");
       if (item) {
         e.preventDefault();
-        openDetail(item.dataset.id);
+        openMatrixDetail(item.dataset.id);
       }
     });
 
@@ -656,6 +756,7 @@
       else if (action === "archive-toggle") archiveToggle();
       else if (action === "search-ia") searchIA();
       else if (action === "init-matrix-position") initMatrixPosition();
+      else if (action === "close-matrix-panel") closeMatrixDetail();
     });
 
     document.addEventListener("input", function (e) {
@@ -668,7 +769,7 @@
     document.addEventListener("change", function (e) {
       if (e.target.matches(".menace-select")) {
         updateCompetitor(state.currentId, { niveau_menace: e.target.value });
-        renderDetail();
+        refreshDetailSurfaces();
       } else if (e.target.matches("input[type='range'][data-axis]")) {
         setAxisValue(e.target.dataset.axis, Number(e.target.value));
       }
