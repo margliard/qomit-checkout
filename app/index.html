@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qomit — Veille concurrentielle</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="16" height="16">
+            <path d="M8 1 C8.4 4 9 5.6 11 6 C9 6.4 8.4 8 8 11 C7.6 8 7 6.4 5 6 C7 5.6 7.6 4 8 1 Z" fill="#FFFFFF"/>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <span class="brand-name">Qomit</span>
+          <span class="brand-caption">Veille concurrentielle</span>
+        </div>
+      </div>
+      <div class="header-actions" id="dashboard-actions">
+        <button class="btn btn-ghost" id="btn-toggle-archived" type="button">Archivés</button>
+        <button class="btn btn-primary" id="btn-add" type="button">
+          <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          Ajouter
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section id="view-dashboard" class="view">
+        <div id="dashboard-list" class="list"></div>
+      </section>
+
+      <section id="view-detail" class="view" hidden>
+        <button class="link-back" id="btn-back" type="button">
+          <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Dashboard
+        </button>
+        <div id="detail-content"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="modal-add" hidden>
+    <div class="modal">
+      <h2>Ajouter un concurrent</h2>
+      <label for="input-new-name">Nom</label>
+      <input type="text" id="input-new-name" placeholder="Ex. PayPal" autocomplete="off">
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="btn-cancel-add" type="button">Annuler</button>
+        <button class="btn btn-primary" id="btn-confirm-add" type="button">Ajouter</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
